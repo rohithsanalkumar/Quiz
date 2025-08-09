@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
     const db = firebase.firestore();
+    // (all other element variables are the same)
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
     const logoutButton = document.getElementById('logout-button');
@@ -42,6 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizSection = document.getElementById('quiz-section');
     const resultsSection = document.getElementById('results-section');
     const backToHomeButton = document.getElementById('back-to-home-button');
+    // NEW: Grab the next button
+    const nextButton = document.getElementById('next-button');
     
     // --- GLOBAL VARIABLES ---
     let currentUser = null;
@@ -123,19 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    
-    /**
-     * MODIFIED: Added logic to find and stop any video before going home.
-     */
     backToHomeButton.addEventListener('click', () => {
-        // --- NEW: Find and stop any playing video ---
         const video = resultsSection.querySelector('video');
         if (video) {
             video.pause();
-            video.currentTime = 0; // Reset video to the beginning
+            video.currentTime = 0;
         }
-
-        // --- Existing logic ---
         resultsSection.classList.add('hidden');
         document.getElementById('manage-controls').classList.remove('hidden');
         fileListSection.classList.remove('hidden');
@@ -143,6 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadSection.classList.add('hidden');
         fileListSection.classList.remove('manage-mode');
         manageQuizButton.textContent = 'Manage Quizzes';
+    });
+
+    // NEW: Add an event listener for the next button
+    nextButton.addEventListener('click', () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentQuiz.questions.length) {
+            displayQuestion();
+        } else {
+            showResults();
+        }
     });
 
     // --- FIREBASE QUIZ FUNCTIONS ---
@@ -206,7 +212,12 @@ document.addEventListener('DOMContentLoaded', () => {
         quizSection.classList.remove('hidden');
         displayQuestion();
     }
+
+    /**
+     * MODIFIED: Now hides the next button when a new question is displayed.
+     */
     function displayQuestion() {
+        nextButton.classList.add('hidden'); // Hide next button
         const question = currentQuiz.questions[currentQuestionIndex];
         document.getElementById('quiz-title').textContent = currentQuiz.title;
         document.getElementById('question-text').textContent = question.questionText;
@@ -221,30 +232,34 @@ document.addEventListener('DOMContentLoaded', () => {
             optionsContainer.appendChild(button);
         });
     }
+
+    /**
+     * MODIFIED: No longer uses setTimeout. Shows the next button instead.
+     */
     function selectAnswer(selectedOption, clickedButton) {
         document.querySelectorAll('.option-button').forEach(btn => btn.disabled = true);
         const question = currentQuiz.questions[currentQuestionIndex];
         const correctAnswer = question.correctAnswerText;
         userAnswers[currentQuestionIndex] = selectedOption;
+        
         if (selectedOption === correctAnswer) {
             clickedButton.classList.add('correct');
         } else {
+            // This is the logic you requested: wrong option stays red, correct turns green
             clickedButton.classList.add('incorrect');
             document.querySelectorAll('.option-button').forEach(btn => {
-                if (btn.textContent === correctAnswer) btn.classList.add('correct');
+                if (btn.textContent === correctAnswer) {
+                    btn.classList.add('correct');
+                }
             });
         }
-        setTimeout(() => {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < currentQuiz.questions.length) {
-                displayQuestion();
-            } else {
-                showResults();
-            }
-        }, 1500);
+        
+        // Show the next button instead of advancing automatically
+        nextButton.classList.remove('hidden');
     }
     
     function showResults() {
+        // (This function and the ones below are unchanged from the previous version)
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
         const oldFeedback = resultsSection.querySelector('.feedback-message');
