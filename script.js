@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- NEW: Add arrays for your messages ---
-   const congratsFeedback = [
+    // --- Arrays for paired messages and GIFs ---
+const congratsFeedback = [
         { message: "Congratzz maange", gif: "1.gif" },
         { message: "Adipoliii", gif: "2.gif" },
         { message: "Enikk vayya!!!", gif: "3.gif" },
@@ -28,16 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
     const db = firebase.firestore();
+
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
-    // ... (rest of your element variables are the same)
     const logoutButton = document.getElementById('logout-button');
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
     const loginButton = document.getElementById('login-button');
+    
     const fileInput = document.getElementById('file-input');
     const uploadButton = document.getElementById('upload-button');
     const fileList = document.getElementById('file-list');
+    
     const uploadSection = document.getElementById('upload-section');
     const fileListSection = document.getElementById('file-list-section');
     const quizSection = document.getElementById('quiz-section');
@@ -207,14 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
     
-    /**
-     * MODIFIED: This function now handles both congrats and troll messages.
-     */
     function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
 
-        // Clean up any old feedback messages first
         const oldFeedback = resultsSection.querySelector('.feedback-message');
         if (oldFeedback) {
             oldFeedback.remove();
@@ -244,30 +242,24 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
         
-        // --- NEW LOGIC FOR CONDITIONAL MESSAGES ---
-
-        // Condition 1: Perfect Score
+        // --- LOGIC FOR PAIRED MESSAGES AND GIFS ---
         if (finalScore === totalQuestions && totalQuestions > 0) {
-            const randomMsg = congratsMessages[Math.floor(Math.random() * congratsMessages.length)];
-            const randomGifNum = Math.floor(Math.random() * 12) + 1;
-            const gifPath = `icons/congrats/${randomGifNum}.gif`;
-            displayFeedbackMessage(randomMsg, gifPath, '#28a745'); // Green color
+            // Pick a random congrats object
+            const feedback = congratsFeedback[Math.floor(Math.random() * congratsFeedback.length)];
+            const gifPath = `icons/congrats/${feedback.gif}`;
+            displayFeedbackMessage(feedback.message, gifPath, '#28a745');
         } 
-        // Condition 2: Score is below 5
         else if (finalScore < 5 && totalQuestions > 0) {
-            const randomMsg = trollMessages[Math.floor(Math.random() * trollMessages.length)];
-            const randomGifNum = Math.floor(Math.random() * 5) + 1;
-            const gifPath = `icons/troll/${randomGifNum}.gif`;
-            displayFeedbackMessage(randomMsg, gifPath, '#dc3545'); // Red color
+            // Pick a random troll object
+            const feedback = trollFeedback[Math.floor(Math.random() * trollFeedback.length)];
+            const gifPath = `icons/troll/${feedback.gif}`;
+            displayFeedbackMessage(feedback.message, gifPath, '#dc3545');
         }
     }
 
-    /**
-     * NEW: A helper function to display the feedback message and GIF.
-     */
     function displayFeedbackMessage(message, gifPath, color) {
         const feedbackContainer = document.createElement('div');
-        feedbackContainer.className = 'feedback-message'; // A common class for cleanup
+        feedbackContainer.className = 'feedback-message';
         feedbackContainer.style.textAlign = 'center';
         feedbackContainer.style.margin = '20px 0';
         
@@ -280,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const feedbackImage = document.createElement('img');
         feedbackImage.src = gifPath;
         feedbackImage.alt = 'Feedback GIF';
-        feedbackImage.style.width = '100px'; // A bit larger for more impact
+        feedbackImage.style.width = '100px';
         feedbackImage.style.height = '100px';
         feedbackImage.style.marginTop = '10px';
         
@@ -329,5 +321,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
-
