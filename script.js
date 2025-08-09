@@ -2,26 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Arrays for paired messages and GIFs ---
     const congratsFeedback = [
-        { message: "Congratzz maange", gif: "1.gif" },
-        { message: "Adipoliii", gif: "2.gif" },
-        { message: "Enikk vayya!!!", gif: "3.gif" },
-        { message: "Kollaam mole", gif: "4.gif" },
-        { message: "Keep it up", gif: "5.gif" },
-        { message: "Oh My God!!!", gif: "6.gif" },
-        { message: "Yeeey", gif: "7.gif" },
-        { message: "Maanga jayiche...", gif: "8.gif" },
-        { message: "Yo", gif: "9.gif" },
-        { message: "Nice...", gif: "10.gif" },
-        { message: "Yey yey...", gif: "11.gif" },
-        { message: "Dinga Dinga..", gif: "12.gif" },
+        { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yeeey", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
     ];
-
     const trollFeedback = [
-        { message: "Enthvaayith?", gif: "1.gif" },
-        { message: "Onnum parayaanilla...", gif: "2.gif" },
-        { message: "Padichitt varoo maange...", gif: "3.gif" },
-        { message: "Nirthy podei...", gif: "4.gif" },
-        { message: "Ayyee... Thott Thott", gif: "5.gif" }
+        { message: "Enthvaayith?", gif: "1.gif" }, { message: "Onnum parayaanilla...", gif: "2.gif" }, { message: "Padichitt varoo maange...", gif: "3.gif" }, { message: "Nirthy podei...", gif: "4.gif" }, { message: "Ayyee... Thott Thott", gif: "5.gif" }
     ];
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
@@ -34,18 +18,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
     const loginButton = document.getElementById('login-button');
-    
     const manageQuizButton = document.getElementById('manage-quiz-button');
-    
     const fileInput = document.getElementById('file-input');
     const uploadButton = document.getElementById('upload-button');
     const fileList = document.getElementById('file-list');
-    
     const uploadSection = document.getElementById('upload-section');
     const fileListSection = document.getElementById('file-list-section');
     const quizSection = document.getElementById('quiz-section');
     const resultsSection = document.getElementById('results-section');
     const backToHomeButton = document.getElementById('back-to-home-button');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalCodeInput = document.getElementById('modal-code-input');
+    const modalSubmitButton = document.getElementById('modal-submit-button');
+    const modalCloseButton = document.getElementById('modal-close-button');
+    const modalError = document.getElementById('modal-error');
     
     // --- GLOBAL VARIABLES ---
     let currentUser = null;
@@ -82,32 +68,41 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutButton.addEventListener('click', () => auth.signOut());
 
     // --- UI EVENT LISTENERS ---
-    
-    /**
-     * MODIFIED: This function now asks for a code before entering manage mode.
-     */
     manageQuizButton.addEventListener('click', () => {
-        // If we are already in manage mode, the button's job is to exit it.
         if (isManageMode) {
             isManageMode = false;
             uploadSection.classList.add('hidden');
             fileListSection.classList.remove('manage-mode');
             manageQuizButton.textContent = 'Manage Quizzes';
-            return; // Exit the function here
+        } else {
+            modalCodeInput.value = "";
+            modalError.classList.add('hidden');
+            modalOverlay.classList.remove('hidden');
+            modalCodeInput.focus();
         }
+    });
 
-        // If we are NOT in manage mode, ask for the code.
-        const code = prompt("Please enter the authorization code:");
-
+    modalSubmitButton.addEventListener('click', () => {
+        const code = modalCodeInput.value;
         if (code === "007") {
-            // Correct code: enter manage mode
             isManageMode = true;
             uploadSection.classList.remove('hidden');
             fileListSection.classList.add('manage-mode');
             manageQuizButton.textContent = 'Done Managing';
-        } else if (code !== null) {
-            // Incorrect code was entered (and the user didn't click "cancel")
-            alert("Incorrect code.");
+            closeModal();
+        } else {
+            modalError.classList.remove('hidden');
+            modalCodeInput.value = "";
+        }
+    });
+
+    function closeModal() {
+        modalOverlay.classList.add('hidden');
+    }
+    modalCloseButton.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) {
+            closeModal();
         }
     });
 
@@ -147,11 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsSection.classList.add('hidden');
         document.getElementById('manage-controls').classList.remove('hidden');
         fileListSection.classList.remove('hidden');
-
         isManageMode = false;
         uploadSection.classList.add('hidden');
         fileListSection.classList.remove('manage-mode');
         manageQuizButton.textContent = 'Manage Quizzes';
+        closeModal();
     });
 
     // --- FIREBASE QUIZ FUNCTIONS ---
@@ -211,10 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentQuiz.questions = processedQuestions;
         currentQuestionIndex = 0;
         userAnswers = [];
-        
         appSection.querySelectorAll('section:not(#quiz-section)').forEach(sec => sec.classList.add('hidden'));
         quizSection.classList.remove('hidden');
-        
         displayQuestion();
     }
     function displayQuestion() {
@@ -258,12 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
-
         const oldFeedback = resultsSection.querySelector('.feedback-message');
-        if (oldFeedback) {
-            oldFeedback.remove();
-        }
-        
+        if (oldFeedback) oldFeedback.remove();
         const reviewContainer = document.getElementById('review-container');
         reviewContainer.innerHTML = '';
         let finalScore = 0;
@@ -287,7 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
-        
         if (finalScore === totalQuestions && totalQuestions > 0) {
             const feedback = congratsFeedback[Math.floor(Math.random() * congratsFeedback.length)];
             const gifPath = `icons/congrats/${feedback.gif}`;
@@ -325,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const reviewContainer = document.getElementById('review-container');
         resultsSection.insertBefore(feedbackContainer, reviewContainer);
     }
-
+    
     function displayFeedbackVideo(videoPath) {
         const feedbackContainer = document.createElement('div');
         feedbackContainer.className = 'feedback-message';
