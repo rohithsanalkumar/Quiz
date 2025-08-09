@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- GLOBAL VARIABLES ---
     let currentUser = null;
-    let userQuizzes = {}; // Will hold quizzes loaded from Firestore
+    let userQuizzes = {};
     let currentQuiz = {};
     let currentQuestionIndex = 0;
     let userAnswers = [];
@@ -134,40 +134,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- QUIZ LOGIC ---
-    
-    /**
-     * THIS IS THE CORRECTED FUNCTION
-     */
     function startQuiz(quizId) {
         const fullQuizData = userQuizzes[quizId];
-
-        // Create a new object for the current quiz session
         currentQuiz = {
             title: fullQuizData.title,
-            questions: [] // Start with an empty questions array
+            questions: []
         };
-    
-        // Shuffle all available questions from the source file
         let processedQuestions = shuffleArray(fullQuizData.questions);
-    
-        // If there are more than 10, slice the shuffled array down to 10
         if (processedQuestions.length > 10) {
             processedQuestions = processedQuestions.slice(0, 10);
         }
-    
-        // Assign the final, processed list of questions to our current quiz
         currentQuiz.questions = processedQuestions;
-    
-        // Reset state for the new quiz
         currentQuestionIndex = 0;
         userAnswers = [];
-    
-        // Hide main sections and show the quiz section
+
         uploadSection.classList.add('hidden');
         fileListSection.classList.add('hidden');
         quizSection.classList.remove('hidden');
         resultsSection.classList.add('hidden');
-        
         displayQuestion();
     }
 
@@ -211,16 +195,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
     
+    /**
+     * THIS IS THE CORRECTED FUNCTION
+     */
     function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
+
+        // --- FIX: Clean up any old congrats message FIRST ---
         const oldCongrats = resultsSection.querySelector('.congrats-message');
-        if (oldCongrats) oldCongrats.remove();
+        if (oldCongrats) {
+            oldCongrats.remove();
+        }
         
         const reviewContainer = document.getElementById('review-container');
         reviewContainer.innerHTML = '';
         let finalScore = 0;
-        const totalQuestions = currentQuiz.questions.length; // This will now correctly be 10 (or less)
+        const totalQuestions = currentQuiz.questions.length;
         currentQuiz.questions.forEach((question, index) => {
             const userAnswer = userAnswers[index];
             const isCorrect = userAnswer === question.correctAnswerText;
@@ -240,25 +231,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
+        
+        // This part now only runs if the CURRENT score is perfect
         if (finalScore === totalQuestions && totalQuestions > 0) {
             const congratsMessage = document.createElement('div');
-            congratsMessage.className = 'congrats-message';
+            congratsMessage.className = 'congrats-message'; // This class is important for cleanup
             congratsMessage.style.textAlign = 'center';
             congratsMessage.style.margin = '20px 0';
+            
             const messageText = document.createElement('p');
             messageText.style.fontSize = '1.2em';
             messageText.style.color = '#28a745';
             messageText.style.fontWeight = 'bold';
             messageText.textContent = `Congratzzz you deserve this mango for scoring ${finalScore}/${totalQuestions} `;
+            
             const mangoImage = document.createElement('img');
             mangoImage.src = 'icons/mango.png';
             mangoImage.alt = 'Mango';
             mangoImage.style.width = '50px';
             mangoImage.style.height = '50px';
             mangoImage.style.verticalAlign = 'middle';
+            mangoImage.style.marginLeft = '10px';
+            
             messageText.appendChild(mangoImage);
             congratsMessage.appendChild(messageText);
-            resultsSection.insertBefore(messageText, reviewContainer);
+
+            // --- FIX: Insert the container, not just the text ---
+            resultsSection.insertBefore(congratsMessage, reviewContainer);
         }
     }
 
