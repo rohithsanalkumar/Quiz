@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { message: "Enikk vayya!!!", gif: "3.gif" },
         { message: "Kollaam mole", gif: "4.gif" },
         { message: "Keep it up", gif: "5.gif" },
-        { message: "Ehh?", gif: "6.gif" },
+        { message: "Oh My God!!!", gif: "6.gif" },
         { message: "Yeeey", gif: "7.gif" },
         { message: "Maanga jayiche...", gif: "8.gif" },
         { message: "Yo", gif: "9.gif" },
@@ -334,4 +334,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
 
