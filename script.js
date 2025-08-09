@@ -27,16 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
     const db = firebase.firestore();
+
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
     const logoutButton = document.getElementById('logout-button');
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
     const loginButton = document.getElementById('login-button');
+    
     const manageQuizButton = document.getElementById('manage-quiz-button');
+    
     const fileInput = document.getElementById('file-input');
     const uploadButton = document.getElementById('upload-button');
     const fileList = document.getElementById('file-list');
+    
     const uploadSection = document.getElementById('upload-section');
     const fileListSection = document.getElementById('file-list-section');
     const quizSection = document.getElementById('quiz-section');
@@ -66,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.add('hidden');
         }
     });
+
     loginButton.addEventListener('click', () => {
         const username = usernameInput.value;
         const password = passwordInput.value;
@@ -73,16 +78,41 @@ document.addEventListener('DOMContentLoaded', () => {
         auth.signInWithEmailAndPassword(email, password)
             .catch(error => alert("Incorrect username or password."));
     });
+
     logoutButton.addEventListener('click', () => auth.signOut());
 
     // --- UI EVENT LISTENERS ---
+    
+    /**
+     * MODIFIED: This function now asks for a code before entering manage mode.
+     */
     manageQuizButton.addEventListener('click', () => {
-        isManageMode = !isManageMode;
-        uploadSection.classList.toggle('hidden', !isManageMode);
-        fileListSection.classList.toggle('manage-mode', isManageMode);
-        manageQuizButton.textContent = isManageMode ? 'Done Managing' : 'Manage Quizzes';
+        // If we are already in manage mode, the button's job is to exit it.
+        if (isManageMode) {
+            isManageMode = false;
+            uploadSection.classList.add('hidden');
+            fileListSection.classList.remove('manage-mode');
+            manageQuizButton.textContent = 'Manage Quizzes';
+            return; // Exit the function here
+        }
+
+        // If we are NOT in manage mode, ask for the code.
+        const code = prompt("Please enter the authorization code:");
+
+        if (code === "007") {
+            // Correct code: enter manage mode
+            isManageMode = true;
+            uploadSection.classList.remove('hidden');
+            fileListSection.classList.add('manage-mode');
+            manageQuizButton.textContent = 'Done Managing';
+        } else if (code !== null) {
+            // Incorrect code was entered (and the user didn't click "cancel")
+            alert("Incorrect code.");
+        }
     });
+
     uploadButton.addEventListener('click', () => fileInput.click());
+    
     fileInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -99,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
         event.target.value = '';
     });
+
     fileList.addEventListener('click', async (event) => {
         const quizId = event.target.dataset.quizId;
         if (event.target.classList.contains('start-button')) {
@@ -111,10 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    
     backToHomeButton.addEventListener('click', () => {
         resultsSection.classList.add('hidden');
         document.getElementById('manage-controls').classList.remove('hidden');
         fileListSection.classList.remove('hidden');
+
         isManageMode = false;
         uploadSection.classList.add('hidden');
         fileListSection.classList.remove('manage-mode');
@@ -178,8 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
         currentQuiz.questions = processedQuestions;
         currentQuestionIndex = 0;
         userAnswers = [];
+        
         appSection.querySelectorAll('section:not(#quiz-section)').forEach(sec => sec.classList.add('hidden'));
         quizSection.classList.remove('hidden');
+        
         displayQuestion();
     }
     function displayQuestion() {
@@ -220,9 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
     
-    /**
-     * MODIFIED: Added a new condition to check for a score of zero.
-     */
     function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
@@ -261,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const gifPath = `icons/congrats/${feedback.gif}`;
             displayFeedbackMessage(feedback.message, gifPath, '#28a745');
         } 
-        // --- NEW: Special condition for a score of exactly zero ---
         else if (finalScore === 0 && totalQuestions > 0) {
             const videoPath = 'videos/fail_video.mp4';
             displayFeedbackVideo(videoPath);
@@ -295,25 +326,19 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsSection.insertBefore(feedbackContainer, reviewContainer);
     }
 
-    /**
-     * NEW: A helper function to display the feedback video.
-     */
     function displayFeedbackVideo(videoPath) {
         const feedbackContainer = document.createElement('div');
-        feedbackContainer.className = 'feedback-message'; // Use the same class for easy cleanup
+        feedbackContainer.className = 'feedback-message';
         feedbackContainer.style.textAlign = 'center';
         feedbackContainer.style.margin = '20px 0';
-
         const video = document.createElement('video');
         video.src = videoPath;
         video.width = 320; 
         video.height = 180;
         video.autoplay = true; 
         video.controls = true; 
-        video.loop = true; // This makes the video loop
-        
+        video.loop = true;
         feedbackContainer.appendChild(video);
-        
         const reviewContainer = document.getElementById('review-container');
         resultsSection.insertBefore(feedbackContainer, reviewContainer);
     }
