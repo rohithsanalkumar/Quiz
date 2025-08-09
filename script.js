@@ -2,19 +2,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- NEW: Add arrays for your messages ---
     const congratsMessages = [
-        "Outstanding! A perfect score!",
-        "Flawless victory! You're a genius!",
-        "Amazing! You aced it!",
-        "Incredible! You didn't miss a single one!",
-        "Perfection! You're unstoppable!"
+        "Adipoli!!!",
+        "You're a genius!",
+        "Amazing!",
+        "Maaga jayiche!!!",
+        "Perfection!"
     ];
 
     const trollMessages = [
-        "Well, that was an attempt.",
-        "Did you try closing your eyes?",
-        "My cat could do better. And she can't read.",
-        "Maybe this just isn't your topic.",
-        "Better luck next time... or the time after that."
+        "Ayyee... Thott Thott",
+        "Nirthy podei...",
+        "Onnum parayaanilla...",
+        "Padichitt varu maange...",
+        "Enthvaayith?"
     ];
 
 
@@ -322,3 +322,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
