@@ -2,26 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Arrays for paired messages and GIFs ---
     const congratsFeedback = [
-        { message: "Congratzz maange", gif: "1.gif" },
-        { message: "Adipoliii", gif: "2.gif" },
-        { message: "Enikk vayya!!!", gif: "3.gif" },
-        { message: "Kollaam mole", gif: "4.gif" },
-        { message: "Keep it up", gif: "5.gif" },
-        { message: "Oh My God!!!", gif: "6.gif" },
-        { message: "Yeeey", gif: "7.gif" },
-        { message: "Maanga jayiche...", gif: "8.gif" },
-        { message: "Yo", gif: "9.gif" },
-        { message: "Nice...", gif: "10.gif" },
-        { message: "Yey yey...", gif: "11.gif" },
-        { message: "Dinga Dinga..", gif: "12.gif" },
+        { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yeeey", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
     ];
-
     const trollFeedback = [
-        { message: "Enthvaayith?", gif: "1.gif" },
-        { message: "Onnum parayaanilla...", gif: "2.gif" },
-        { message: "Padichitt varoo maange...", gif: "3.gif" },
-        { message: "Nirthy podei...", gif: "4.gif" },
-        { message: "Ayyee... Thott Thott", gif: "5.gif" }
+        { message: "Enthvaayith?", gif: "1.gif" }, { message: "Onnum parayaanilla...", gif: "2.gif" }, { message: "Padichitt varoo maange...", gif: "3.gif" }, { message: "Nirthy podei...", gif: "4.gif" }, { message: "Ayyee... Thott Thott", gif: "5.gif" }
     ];
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
@@ -42,7 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizSection = document.getElementById('quiz-section');
     const resultsSection = document.getElementById('results-section');
     const backToHomeButton = document.getElementById('back-to-home-button');
-    const nextButton = document.getElementById('next-button'); // Get the new button
+    const nextButton = document.getElementById('next-button');
+    // NEW: Grab the question counter element
+    const questionCounter = document.getElementById('question-counter'); 
     const modalOverlay = document.getElementById('modal-overlay');
     const modalCodeInput = document.getElementById('modal-code-input');
     const modalSubmitButton = document.getElementById('modal-submit-button');
@@ -72,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.add('hidden');
         }
     });
-
     loginButton.addEventListener('click', () => {
         const username = usernameInput.value;
         const password = passwordInput.value;
@@ -80,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
         auth.signInWithEmailAndPassword(email, password)
             .catch(error => alert("Incorrect username or password."));
     });
-
     logoutButton.addEventListener('click', () => auth.signOut());
 
     // --- UI EVENT LISTENERS ---
@@ -97,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
             modalCodeInput.focus();
         }
     });
-
     modalSubmitButton.addEventListener('click', () => {
         const code = modalCodeInput.value;
         if (code === "007") {
@@ -111,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
             modalCodeInput.value = "";
         }
     });
-
     function closeModal() {
         modalOverlay.classList.add('hidden');
     }
@@ -121,9 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
-
     uploadButton.addEventListener('click', () => fileInput.click());
-    
     fileInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -140,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
         event.target.value = '';
     });
-
     fileList.addEventListener('click', async (event) => {
         const quizId = event.target.dataset.quizId;
         if (event.target.classList.contains('start-button')) {
@@ -153,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    
     backToHomeButton.addEventListener('click', () => {
         const video = resultsSection.querySelector('video');
         if (video) {
@@ -169,8 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
         manageQuizButton.textContent = 'Manage Quizzes';
         closeModal();
     });
-
-    // NEW: Event listener for the next button
     nextButton.addEventListener('click', () => {
         currentQuestionIndex++;
         if (currentQuestionIndex < currentQuiz.questions.length) {
@@ -179,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showResults();
         }
     });
-
 
     // --- FIREBASE QUIZ FUNCTIONS ---
     async function saveQuizToFirestore(quizData) {
@@ -242,10 +217,19 @@ document.addEventListener('DOMContentLoaded', () => {
         quizSection.classList.remove('hidden');
         displayQuestion();
     }
-    
+
+    /**
+     * MODIFIED: Now updates the question counter.
+     */
     function displayQuestion() {
-        nextButton.classList.add('hidden'); // Hide next button at the start of a question
+        nextButton.classList.add('hidden');
         const question = currentQuiz.questions[currentQuestionIndex];
+        
+        // --- NEW: Update the question counter text ---
+        const totalQuestions = currentQuiz.questions.length;
+        const questionNumber = currentQuestionIndex + 1;
+        questionCounter.textContent = `Question ${questionNumber} of ${totalQuestions}`;
+
         document.getElementById('quiz-title').textContent = currentQuiz.title;
         document.getElementById('question-text').textContent = question.questionText;
         const optionsContainer = document.getElementById('options-container');
@@ -259,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             optionsContainer.appendChild(button);
         });
     }
-    
+
     function selectAnswer(selectedOption, clickedButton) {
         document.querySelectorAll('.option-button').forEach(btn => btn.disabled = true);
         const question = currentQuiz.questions[currentQuestionIndex];
@@ -273,16 +257,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (btn.textContent === correctAnswer) btn.classList.add('correct');
             });
         }
-        
-        // Show the next button instead of using a timer
         nextButton.classList.remove('hidden');
     }
     
     function showResults() {
+        // (This function and the ones below are unchanged from the previous version)
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
         const oldFeedback = resultsSection.querySelector('.feedback-message');
-        if (oldFeedback) oldFeedback.remove();
+        if (oldFeedback) {
+            oldFeedback.remove();
+        }
         const reviewContainer = document.getElementById('review-container');
         reviewContainer.innerHTML = '';
         let finalScore = 0;
