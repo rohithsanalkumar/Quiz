@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsSection = document.getElementById('results-section');
     const backToHomeButton = document.getElementById('back-to-home-button');
     const nextButton = document.getElementById('next-button');
-    // NEW: Grab the question counter element
     const questionCounter = document.getElementById('question-counter'); 
     const modalOverlay = document.getElementById('modal-overlay');
     const modalCodeInput = document.getElementById('modal-code-input');
@@ -218,17 +217,13 @@ document.addEventListener('DOMContentLoaded', () => {
         displayQuestion();
     }
 
-    /**
-     * MODIFIED: Now updates the question counter.
-     */
     function displayQuestion() {
         nextButton.classList.add('hidden');
         const question = currentQuiz.questions[currentQuestionIndex];
         
-        // --- NEW: Update the question counter text ---
-        const totalQuestions = currentQuiz.questions.length;
+        // --- THIS IS THE MODIFIED PART ---
         const questionNumber = currentQuestionIndex + 1;
-        questionCounter.textContent = `Question ${questionNumber} of ${totalQuestions}`;
+        questionCounter.textContent = `Question ${questionNumber}`;
 
         document.getElementById('quiz-title').textContent = currentQuiz.title;
         document.getElementById('question-text').textContent = question.questionText;
@@ -261,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function showResults() {
-        // (This function and the ones below are unchanged from the previous version)
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
         const oldFeedback = resultsSection.querySelector('.feedback-message');
