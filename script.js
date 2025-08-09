@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
     const db = firebase.firestore();
-    // (all other element variables are the same)
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
     const logoutButton = document.getElementById('logout-button');
@@ -43,8 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizSection = document.getElementById('quiz-section');
     const resultsSection = document.getElementById('results-section');
     const backToHomeButton = document.getElementById('back-to-home-button');
-    // NEW: Grab the next button
-    const nextButton = document.getElementById('next-button');
+    const nextButton = document.getElementById('next-button'); // Get the new button
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalCodeInput = document.getElementById('modal-code-input');
+    const modalSubmitButton = document.getElementById('modal-submit-button');
+    const modalCloseButton = document.getElementById('modal-close-button');
+    const modalError = document.getElementById('modal-error');
     
     // --- GLOBAL VARIABLES ---
     let currentUser = null;
@@ -69,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.add('hidden');
         }
     });
+
     loginButton.addEventListener('click', () => {
         const username = usernameInput.value;
         const password = passwordInput.value;
@@ -76,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         auth.signInWithEmailAndPassword(email, password)
             .catch(error => alert("Incorrect username or password."));
     });
+
     logoutButton.addEventListener('click', () => auth.signOut());
 
     // --- UI EVENT LISTENERS ---
@@ -85,19 +90,40 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadSection.classList.add('hidden');
             fileListSection.classList.remove('manage-mode');
             manageQuizButton.textContent = 'Manage Quizzes';
-            return;
+        } else {
+            modalCodeInput.value = "";
+            modalError.classList.add('hidden');
+            modalOverlay.classList.remove('hidden');
+            modalCodeInput.focus();
         }
-        const code = prompt("Please enter the authorization code:");
+    });
+
+    modalSubmitButton.addEventListener('click', () => {
+        const code = modalCodeInput.value;
         if (code === "007") {
             isManageMode = true;
             uploadSection.classList.remove('hidden');
             fileListSection.classList.add('manage-mode');
             manageQuizButton.textContent = 'Done Managing';
-        } else if (code !== null) {
-            alert("Incorrect code.");
+            closeModal();
+        } else {
+            modalError.classList.remove('hidden');
+            modalCodeInput.value = "";
         }
     });
+
+    function closeModal() {
+        modalOverlay.classList.add('hidden');
+    }
+    modalCloseButton.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) {
+            closeModal();
+        }
+    });
+
     uploadButton.addEventListener('click', () => fileInput.click());
+    
     fileInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -114,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
         event.target.value = '';
     });
+
     fileList.addEventListener('click', async (event) => {
         const quizId = event.target.dataset.quizId;
         if (event.target.classList.contains('start-button')) {
@@ -126,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    
     backToHomeButton.addEventListener('click', () => {
         const video = resultsSection.querySelector('video');
         if (video) {
@@ -139,9 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadSection.classList.add('hidden');
         fileListSection.classList.remove('manage-mode');
         manageQuizButton.textContent = 'Manage Quizzes';
+        closeModal();
     });
 
-    // NEW: Add an event listener for the next button
+    // NEW: Event listener for the next button
     nextButton.addEventListener('click', () => {
         currentQuestionIndex++;
         if (currentQuestionIndex < currentQuiz.questions.length) {
@@ -150,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showResults();
         }
     });
+
 
     // --- FIREBASE QUIZ FUNCTIONS ---
     async function saveQuizToFirestore(quizData) {
@@ -212,12 +242,9 @@ document.addEventListener('DOMContentLoaded', () => {
         quizSection.classList.remove('hidden');
         displayQuestion();
     }
-
-    /**
-     * MODIFIED: Now hides the next button when a new question is displayed.
-     */
+    
     function displayQuestion() {
-        nextButton.classList.add('hidden'); // Hide next button
+        nextButton.classList.add('hidden'); // Hide next button at the start of a question
         const question = currentQuiz.questions[currentQuestionIndex];
         document.getElementById('quiz-title').textContent = currentQuiz.title;
         document.getElementById('question-text').textContent = question.questionText;
@@ -232,40 +259,30 @@ document.addEventListener('DOMContentLoaded', () => {
             optionsContainer.appendChild(button);
         });
     }
-
-    /**
-     * MODIFIED: No longer uses setTimeout. Shows the next button instead.
-     */
+    
     function selectAnswer(selectedOption, clickedButton) {
         document.querySelectorAll('.option-button').forEach(btn => btn.disabled = true);
         const question = currentQuiz.questions[currentQuestionIndex];
         const correctAnswer = question.correctAnswerText;
         userAnswers[currentQuestionIndex] = selectedOption;
-        
         if (selectedOption === correctAnswer) {
             clickedButton.classList.add('correct');
         } else {
-            // This is the logic you requested: wrong option stays red, correct turns green
             clickedButton.classList.add('incorrect');
             document.querySelectorAll('.option-button').forEach(btn => {
-                if (btn.textContent === correctAnswer) {
-                    btn.classList.add('correct');
-                }
+                if (btn.textContent === correctAnswer) btn.classList.add('correct');
             });
         }
         
-        // Show the next button instead of advancing automatically
+        // Show the next button instead of using a timer
         nextButton.classList.remove('hidden');
     }
     
     function showResults() {
-        // (This function and the ones below are unchanged from the previous version)
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
         const oldFeedback = resultsSection.querySelector('.feedback-message');
-        if (oldFeedback) {
-            oldFeedback.remove();
-        }
+        if (oldFeedback) oldFeedback.remove();
         const reviewContainer = document.getElementById('review-container');
         reviewContainer.innerHTML = '';
         let finalScore = 0;
