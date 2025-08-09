@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- NEW: Arrays of paired messages and GIFs ---
-    const congratsFeedback = [
+    // --- Arrays for paired messages and GIFs ---
+const congratsFeedback = [
         { message: "Congratzz maange", gif: "1.gif" },
         { message: "Adipoliii", gif: "2.gif" },
         { message: "Enikk vayya!!!", gif: "3.gif" },
@@ -25,13 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
         { message: "Ayyee... Thott Thott", gif: "5.gif" }
 
 
-
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
     const db = firebase.firestore();
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
-    // ... (rest of your element variables are the same)
     const logoutButton = document.getElementById('logout-button');
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
@@ -208,9 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
     
-    /**
-     * MODIFIED: This function now uses the new feedback arrays.
-     */
     function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
@@ -244,22 +239,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
         
-        // --- NEW LOGIC FOR PAIRED MESSAGES AND GIFS ---
+        // --- LOGIC FOR PAIRED MESSAGES AND GIFS ---
         if (finalScore === totalQuestions && totalQuestions > 0) {
-            // Pick a random congrats object
             const feedback = congratsFeedback[Math.floor(Math.random() * congratsFeedback.length)];
             const gifPath = `icons/congrats/${feedback.gif}`;
             displayFeedbackMessage(feedback.message, gifPath, '#28a745');
         } 
         else if (finalScore < 5 && totalQuestions > 0) {
-            // Pick a random troll object
             const feedback = trollFeedback[Math.floor(Math.random() * trollFeedback.length)];
             const gifPath = `icons/troll/${feedback.gif}`;
             displayFeedbackMessage(feedback.message, gifPath, '#dc3545');
         }
     }
 
-    // This helper function does not need to be changed
     function displayFeedbackMessage(message, gifPath, color) {
         const feedbackContainer = document.createElement('div');
         feedbackContainer.className = 'feedback-message';
