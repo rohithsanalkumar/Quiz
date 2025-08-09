@@ -57,7 +57,21 @@
             <div id="review-container"></div>
             <button id="back-to-home-button">Back to Home</button>
         </section>
+    <section id="results-section" class="hidden">
+            </section>
 
+        <div id="modal-overlay" class="hidden">
+            <div id="auth-modal">
+                <h2>Authorization Required</h2>
+                <p>Please enter the code to manage quizzes.</p>
+                <input type="password" id="modal-code-input" placeholder="Enter code...">
+                <p id="modal-error" class="hidden">Incorrect code. Please try again.</p>
+                <div class="modal-buttons">
+                    <button id="modal-close-button">Cancel</button>
+                    <button id="modal-submit-button">Submit</button>
+                </div>
+            </div>
+        </div>
     </main>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -84,6 +98,7 @@ const firebaseConfig = {
 </body>
 
 </html>
+
 
 
 
