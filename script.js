@@ -1,21 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- NEW: Add arrays for your messages ---
-    const congratsMessages = [
-        "Adipoli!!!",
-        "You're a genius!",
-        "Amazing!",
-        "Maaga jayiche!!!",
-        "Perfection!"
+   const congratsFeedback = [
+        { message: "Congratzz maange", gif: "1.gif" },
+        { message: "Adipoliii", gif: "2.gif" },
+        { message: "Enikk vayya!!!", gif: "3.gif" },
+        { message: "Kollaam mole", gif: "4.gif" },
+        { message: "Keep it up", gif: "5.gif" },
+        { message: "Ehh?", gif: "6.gif" },
+        { message: "Yeeey", gif: "7.gif" },
+        { message: "Maanga jayiche...", gif: "8.gif" },
+        { message: "Yo", gif: "9.gif" },
+        { message: "Nice...", gif: "10.gif" },
+        { message: "Yey yey...", gif: "11.gif" },
+        { message: "Dinga Dinga..", gif: "12.gif" },
+        // ...add more pairs up to 12
     ];
 
-    const trollMessages = [
-        "Ayyee... Thott Thott",
-        "Nirthy podei...",
-        "Onnum parayaanilla...",
-        "Padichitt varu maange...",
-        "Enthvaayith?"
-    ];
+    const trollFeedback = [
+        { message: "Enthvaayith?", gif: "1.gif" },
+        { message: "Onnum parayaanilla...", gif: "2.gif" },
+        { message: "Padichitt varu maange...", gif: "3.gif" },
+        { message: "Nirthy podei...", gif: "4.gif" },
+        { message: "Ayyee... Thott Thott", gif: "5.gif" }
 
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
@@ -322,4 +329,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
 
