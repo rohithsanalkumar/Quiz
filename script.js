@@ -160,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentUser) return;
         try {
             quizData.ownerId = currentUser.uid;
+            quizData.createdAt = firebase.firestore.FieldValue.serverTimestamp(); 
             await db.collection('quizzes').add(quizData);
         } catch (error) { console.error("Error saving quiz: ", error); }
     }
@@ -167,7 +168,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentUser) return {};
         const quizzes = {};
         try {
-            const querySnapshot = await db.collection('quizzes').where("ownerId", "==", currentUser.uid).get();
+            const querySnapshot = await db.collection('quizzes')
+                .where("ownerId", "==", currentUser.uid)
+                .orderBy("createdAt", "desc")
+                .get();
             querySnapshot.forEach((doc) => {
                 quizzes[doc.id] = doc.data();
             });
@@ -216,15 +220,11 @@ document.addEventListener('DOMContentLoaded', () => {
         quizSection.classList.remove('hidden');
         displayQuestion();
     }
-
     function displayQuestion() {
         nextButton.classList.add('hidden');
         const question = currentQuiz.questions[currentQuestionIndex];
-        
-        // --- THIS IS THE MODIFIED PART ---
         const questionNumber = currentQuestionIndex + 1;
         questionCounter.textContent = `Question ${questionNumber}`;
-
         document.getElementById('quiz-title').textContent = currentQuiz.title;
         document.getElementById('question-text').textContent = question.questionText;
         const optionsContainer = document.getElementById('options-container');
@@ -238,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
             optionsContainer.appendChild(button);
         });
     }
-
     function selectAnswer(selectedOption, clickedButton) {
         document.querySelectorAll('.option-button').forEach(btn => btn.disabled = true);
         const question = currentQuiz.questions[currentQuestionIndex];
