@@ -112,4 +112,20 @@ button:disabled {
 .user-answer.correct::before { content: '✔ '; }
 .user-answer.incorrect { color: #dc3545; text-decoration: line-through; }
 .user-answer.incorrect::before { content: '✖ '; }
+
 .correct-answer-text { color: #28a745; font-weight: bold; }
+/* --- Styles for Manage Mode --- */
+
+/* Hide the delete buttons by default */
+.file-item .delete-button {
+    display: none;
+}
+
+/* When the file-list-section has the 'manage-mode' class, show the delete buttons */
+#file-list-section.manage-mode .file-item .delete-button {
+    display: inline-block;
+}
+
+#manage-controls button {
+    width: 100%;
+}
