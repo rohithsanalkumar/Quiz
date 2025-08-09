@@ -1,21 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- NEW: Add arrays for your messages ---
-    const congratsMessages = [
-        "Outstanding! A perfect score!",
-        "Flawless victory! You're a genius!",
-        "Amazing! You aced it!",
-        "Incredible! You didn't miss a single one!",
-        "Perfection! You're unstoppable!"
+    // --- NEW: Arrays of paired messages and GIFs ---
+    const congratsFeedback = [
+        { message: "Congratzz maange", gif: "1.gif" },
+        { message: "Adipoliii", gif: "2.gif" },
+        { message: "Enikk vayya!!!", gif: "3.gif" },
+        { message: "Kollaam mole", gif: "4.gif" },
+        { message: "Keep it up", gif: "5.gif" },
+        { message: "Ehh?", gif: "6.gif" },
+        { message: "Yeeey", gif: "7.gif" },
+        { message: "Maanga jayiche...", gif: "8.gif" },
+        { message: "Yo", gif: "9.gif" },
+        { message: "Nice...", gif: "10.gif" },
+        { message: "Yey yey...", gif: "11.gif" },
+        { message: "Dinga Dinga..", gif: "12.gif" },
+        // ...add more pairs up to 12
     ];
 
-    const trollMessages = [
-        "Well, that was an attempt.",
-        "Did you try closing your eyes?",
-        "My cat could do better. And she can't read.",
-        "Maybe this just isn't your topic.",
-        "Better luck next time... or the time after that."
-    ];
+    const trollFeedback = [
+        { message: "Enthvaayith?", gif: "1.gif" },
+        { message: "Onnum parayaanilla...", gif: "2.gif" },
+        { message: "Padichitt varu maange...", gif: "3.gif" },
+        { message: "Nirthy podei...", gif: "4.gif" },
+        { message: "Ayyee... Thott Thott", gif: "5.gif" }
+
 
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
@@ -201,13 +209,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     /**
-     * MODIFIED: This function now handles both congrats and troll messages.
+     * MODIFIED: This function now uses the new feedback arrays.
      */
     function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
 
-        // Clean up any old feedback messages first
         const oldFeedback = resultsSection.querySelector('.feedback-message');
         if (oldFeedback) {
             oldFeedback.remove();
@@ -237,30 +244,25 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
         
-        // --- NEW LOGIC FOR CONDITIONAL MESSAGES ---
-
-        // Condition 1: Perfect Score
+        // --- NEW LOGIC FOR PAIRED MESSAGES AND GIFS ---
         if (finalScore === totalQuestions && totalQuestions > 0) {
-            const randomMsg = congratsMessages[Math.floor(Math.random() * congratsMessages.length)];
-            const randomGifNum = Math.floor(Math.random() * 12) + 1;
-            const gifPath = `icons/congrats/${randomGifNum}.gif`;
-            displayFeedbackMessage(randomMsg, gifPath, '#28a745'); // Green color
+            // Pick a random congrats object
+            const feedback = congratsFeedback[Math.floor(Math.random() * congratsFeedback.length)];
+            const gifPath = `icons/congrats/${feedback.gif}`;
+            displayFeedbackMessage(feedback.message, gifPath, '#28a745');
         } 
-        // Condition 2: Score is below 5
         else if (finalScore < 5 && totalQuestions > 0) {
-            const randomMsg = trollMessages[Math.floor(Math.random() * trollMessages.length)];
-            const randomGifNum = Math.floor(Math.random() * 5) + 1;
-            const gifPath = `icons/troll/${randomGifNum}.gif`;
-            displayFeedbackMessage(randomMsg, gifPath, '#dc3545'); // Red color
+            // Pick a random troll object
+            const feedback = trollFeedback[Math.floor(Math.random() * trollFeedback.length)];
+            const gifPath = `icons/troll/${feedback.gif}`;
+            displayFeedbackMessage(feedback.message, gifPath, '#dc3545');
         }
     }
 
-    /**
-     * NEW: A helper function to display the feedback message and GIF.
-     */
+    // This helper function does not need to be changed
     function displayFeedbackMessage(message, gifPath, color) {
         const feedbackContainer = document.createElement('div');
-        feedbackContainer.className = 'feedback-message'; // A common class for cleanup
+        feedbackContainer.className = 'feedback-message';
         feedbackContainer.style.textAlign = 'center';
         feedbackContainer.style.margin = '20px 0';
         
@@ -273,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const feedbackImage = document.createElement('img');
         feedbackImage.src = gifPath;
         feedbackImage.alt = 'Feedback GIF';
-        feedbackImage.style.width = '100px'; // A bit larger for more impact
+        feedbackImage.style.width = '100px';
         feedbackImage.style.height = '100px';
         feedbackImage.style.marginTop = '10px';
         
