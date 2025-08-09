@@ -23,9 +23,13 @@
     </div>
 </section>
 
-    <main id="app-section" class="hidden">
+   <main id="app-section" class="hidden">
         
-        <section id="upload-section">
+        <section id="manage-controls">
+            <button id="manage-quiz-button">Manage Quizzes</button>
+        </section>
+
+        <section id="upload-section" class="hidden">
             <h2>Create a New Quiz</h2>
             <p>Upload a .txt file to save a quiz to your account.</p>
             <input type="file" id="file-input" accept=".txt" style="display: none;">
@@ -34,7 +38,8 @@
 
         <section id="file-list-section">
             <h2>My Quizzes</h2>
-            <div id="file-list"></div>
+            <div id="file-list">
+                </div>
         </section>
 
         <section id="quiz-section" class="hidden">
@@ -80,6 +85,7 @@ const firebaseConfig = {
 </body>
 
 </html>
+
 
 
 
