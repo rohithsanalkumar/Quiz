@@ -1,42 +1,46 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Arrays for paired messages and GIFs ---
-const congratsFeedback = [
-        { message: "Congratzz maange", gif: "1.gif" },
-        { message: "Adipoliii", gif: "2.gif" },
-        { message: "Enikk vayya!!!", gif: "3.gif" },
-        { message: "Kollaam mole", gif: "4.gif" },
-        { message: "Keep it up", gif: "5.gif" },
-        { message: "Ehh?", gif: "6.gif" },
-        { message: "Yeeey", gif: "7.gif" },
-        { message: "Maanga jayiche...", gif: "8.gif" },
-        { message: "Yo", gif: "9.gif" },
-        { message: "Nice...", gif: "10.gif" },
-        { message: "Yey yey...", gif: "11.gif" },
-        { message: "Dinga Dinga..", gif: "12.gif" },
-        // ...add more pairs up to 12
+    const congratsFeedback = [
+        { message: "Outstanding! A perfect score!", gif: "1.gif" },
+        { message: "Flawless victory! You're a genius!", gif: "2.gif" },
+        { message: "Amazing! You aced it!", gif: "3.gif" },
+        { message: "Incredible! You didn't miss a single one!", gif: "4.gif" },
+        { message: "Perfection! You're unstoppable!", gif: "5.gif" },
+        { message: "You're on fire! That was brilliant!", gif: "6.gif" },
+        { message: "Aced it! Nothing gets past you.", gif: "7.gif" },
+        { message: "Top of the class! Excellent work.", gif: "8.gif" },
+        { message: "That was a masterclass performance.", gif: "9.gif" },
+        { message: "You've got this down to a science.", gif: "10.gif" },
+        { message: "Simply spectacular!", gif: "11.gif" },
+        { message: "100%! You're a legend!", gif: "12.gif" }
     ];
 
     const trollFeedback = [
-        { message: "Enthvaayith?", gif: "1.gif" },
-        { message: "Onnum parayaanilla...", gif: "2.gif" },
-        { message: "Padichitt varoo maange...", gif: "3.gif" },
-        { message: "Nirthy podei...", gif: "4.gif" },
-        { message: "Ayyee... Thott Thott", gif: "5.gif" }
+        { message: "Well, that was certainly an attempt.", gif: "1.gif" },
+        { message: "Did you try closing your eyes?", gif: "2.gif" },
+        { message: "My cat could do better. And she can't read.", gif: "3.gif" },
+        { message: "Maybe this just isn't your topic.", gif: "4.gif" },
+        { message: "Is 'random guessing' your strategy?", gif: "5.gif" }
     ];
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
     const db = firebase.firestore();
+
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
     const logoutButton = document.getElementById('logout-button');
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
     const loginButton = document.getElementById('login-button');
+    
+    const manageQuizButton = document.getElementById('manage-quiz-button');
+    
     const fileInput = document.getElementById('file-input');
     const uploadButton = document.getElementById('upload-button');
     const fileList = document.getElementById('file-list');
+    
     const uploadSection = document.getElementById('upload-section');
     const fileListSection = document.getElementById('file-list-section');
     const quizSection = document.getElementById('quiz-section');
@@ -49,6 +53,7 @@ const congratsFeedback = [
     let currentQuiz = {};
     let currentQuestionIndex = 0;
     let userAnswers = [];
+    let isManageMode = false;
 
     // --- FIREBASE AUTHENTICATION ---
     auth.onAuthStateChanged(user => {
@@ -70,18 +75,22 @@ const congratsFeedback = [
         const username = usernameInput.value;
         const password = passwordInput.value;
         const email = username.toLowerCase() + '@quizapp.local';
-        
         auth.signInWithEmailAndPassword(email, password)
-            .catch(error => {
-                console.error("FIREBASE LOGIN ERROR:", error);
-                alert("Login failed! Check the browser console (F12) for detailed errors.");
-            });
+            .catch(error => alert("Incorrect username or password."));
     });
 
     logoutButton.addEventListener('click', () => auth.signOut());
 
-    // --- FILE UPLOAD & MANAGEMENT ---
+    // --- UI EVENT LISTENERS ---
+    manageQuizButton.addEventListener('click', () => {
+        isManageMode = !isManageMode;
+        uploadSection.classList.toggle('hidden', !isManageMode);
+        fileListSection.classList.toggle('manage-mode', isManageMode);
+        manageQuizButton.textContent = isManageMode ? 'Done Managing' : 'Manage Quizzes';
+    });
+
     uploadButton.addEventListener('click', () => fileInput.click());
+    
     fileInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -98,6 +107,7 @@ const congratsFeedback = [
         reader.readAsText(file);
         event.target.value = '';
     });
+
     fileList.addEventListener('click', async (event) => {
         const quizId = event.target.dataset.quizId;
         if (event.target.classList.contains('start-button')) {
@@ -109,6 +119,17 @@ const congratsFeedback = [
                 await renderFileList(); 
             }
         }
+    });
+    
+    backToHomeButton.addEventListener('click', () => {
+        resultsSection.classList.add('hidden');
+        document.getElementById('manage-controls').classList.remove('hidden');
+        fileListSection.classList.remove('hidden');
+
+        isManageMode = false;
+        uploadSection.classList.add('hidden');
+        fileListSection.classList.remove('manage-mode');
+        manageQuizButton.textContent = 'Manage Quizzes';
     });
 
     // --- FIREBASE QUIZ FUNCTIONS ---
@@ -137,7 +158,7 @@ const congratsFeedback = [
         } catch (error) { console.error("Error deleting quiz: ", error); }
     }
 
-    // --- UI RENDERING FUNCTIONS ---
+    // --- UI RENDERING ---
     async function renderFileList() {
         userQuizzes = await getQuizzesFromFirestore();
         fileList.innerHTML = '';
@@ -168,10 +189,10 @@ const congratsFeedback = [
         currentQuiz.questions = processedQuestions;
         currentQuestionIndex = 0;
         userAnswers = [];
-        uploadSection.classList.add('hidden');
-        fileListSection.classList.add('hidden');
+        
+        appSection.querySelectorAll('section:not(#quiz-section)').forEach(sec => sec.classList.add('hidden'));
         quizSection.classList.remove('hidden');
-        resultsSection.classList.add('hidden');
+        
         displayQuestion();
     }
     function displayQuestion() {
@@ -262,33 +283,23 @@ const congratsFeedback = [
         feedbackContainer.className = 'feedback-message';
         feedbackContainer.style.textAlign = 'center';
         feedbackContainer.style.margin = '20px 0';
-        
         const messageText = document.createElement('p');
         messageText.style.fontSize = '1.2em';
         messageText.style.fontWeight = 'bold';
         messageText.style.color = color;
         messageText.textContent = message;
-        
         const feedbackImage = document.createElement('img');
         feedbackImage.src = gifPath;
         feedbackImage.alt = 'Feedback GIF';
         feedbackImage.style.width = '100px';
         feedbackImage.style.height = '100px';
         feedbackImage.style.marginTop = '10px';
-        
         feedbackContainer.appendChild(messageText);
         feedbackContainer.appendChild(feedbackImage);
-        
         const reviewContainer = document.getElementById('review-container');
         resultsSection.insertBefore(feedbackContainer, reviewContainer);
     }
-
-    backToHomeButton.addEventListener('click', () => {
-        resultsSection.classList.add('hidden');
-        uploadSection.classList.remove('hidden');
-        fileListSection.classList.remove('hidden');
-    });
-
+    
     // --- HELPER FUNCTIONS ---
     function shuffleArray(array) {
         const shuffled = array.slice();
@@ -321,5 +332,3 @@ const congratsFeedback = [
         }
     }
 });
-
-
