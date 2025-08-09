@@ -20,7 +20,7 @@ const congratsFeedback = [
     const trollFeedback = [
         { message: "Enthvaayith?", gif: "1.gif" },
         { message: "Onnum parayaanilla...", gif: "2.gif" },
-        { message: "Padichitt varu maange...", gif: "3.gif" },
+        { message: "Padichitt varoo maange...", gif: "3.gif" },
         { message: "Nirthy podei...", gif: "4.gif" },
         { message: "Ayyee... Thott Thott", gif: "5.gif" }
     ];
@@ -321,4 +321,5 @@ const congratsFeedback = [
         }
     }
 });
+
 
