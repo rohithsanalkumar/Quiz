@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const querySnapshot = await db.collection('quizzes')
                 .where("ownerId", "==", currentUser.uid)
-                .orderBy("createdAt", "desc")
+                .orderBy("createdAt", "asc") // Changed to 'asc' for oldest first
                 .get();
             querySnapshot.forEach((doc) => {
                 quizzes[doc.id] = doc.data();
