@@ -1,29 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Arrays for paired messages and GIFs ---
-  const congratsFeedback = [
-        { message: "Congratzz maange", gif: "1.gif" },
-        { message: "Adipoliii", gif: "2.gif" },
-        { message: "Enikk vayya!!!", gif: "3.gif" },
-        { message: "Kollaam mole", gif: "4.gif" },
-        { message: "Keep it up", gif: "5.gif" },
-        { message: "Ehh?", gif: "6.gif" },
-        { message: "Yeeey", gif: "7.gif" },
-        { message: "Maanga jayiche...", gif: "8.gif" },
-        { message: "Yo", gif: "9.gif" },
-        { message: "Nice...", gif: "10.gif" },
-        { message: "Yey yey...", gif: "11.gif" },
-        { message: "Dinga Dinga..", gif: "12.gif" },
-        // ...add more pairs up to 12
+    const congratsFeedback = [
+        { message: "Outstanding! A perfect score!", gif: "1.gif" },
+        { message: "Flawless victory! You're a genius!", gif: "2.gif" },
+        { message: "Amazing! You aced it!", gif: "3.gif" },
+        { message: "Incredible! You didn't miss a single one!", gif: "4.gif" },
+        { message: "Perfection! You're unstoppable!", gif: "5.gif" },
+        { message: "You're on fire! That was brilliant!", gif: "6.gif" },
+        { message: "Aced it! Nothing gets past you.", gif: "7.gif" },
+        { message: "Top of the class! Excellent work.", gif: "8.gif" },
+        { message: "That was a masterclass performance.", gif: "9.gif" },
+        { message: "You've got this down to a science.", gif: "10.gif" },
+        { message: "Simply spectacular!", gif: "11.gif" },
+        { message: "100%! You're a legend!", gif: "12.gif" }
     ];
 
     const trollFeedback = [
-        { message: "Enthvaayith?", gif: "1.gif" },
-        { message: "Onnum parayaanilla...", gif: "2.gif" },
-        { message: "Padichitt varu maange...", gif: "3.gif" },
-        { message: "Nirthy podei...", gif: "4.gif" },
-        { message: "Ayyee... Thott Thott", gif: "5.gif" }
-
+        { message: "Well, that was certainly an attempt.", gif: "1.gif" },
+        { message: "Did you try closing your eyes?", gif: "2.gif" },
+        { message: "My cat could do better. And she can't read.", gif: "3.gif" },
+        { message: "Maybe this just isn't your topic.", gif: "4.gif" },
+        { message: "Is 'random guessing' your strategy?", gif: "5.gif" }
+    ];
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
@@ -321,4 +320,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
