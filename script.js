@@ -1,20 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- NEW: Add arrays for your messages ---
+    const congratsMessages = [
+        "Outstanding! A perfect score!",
+        "Flawless victory! You're a genius!",
+        "Amazing! You aced it!",
+        "Incredible! You didn't miss a single one!",
+        "Perfection! You're unstoppable!"
+    ];
+
+    const trollMessages = [
+        "Well, that was an attempt.",
+        "Did you try closing your eyes?",
+        "My cat could do better. And she can't read.",
+        "Maybe this just isn't your topic.",
+        "Better luck next time... or the time after that."
+    ];
+
+
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
     const db = firebase.firestore();
-
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
+    // ... (rest of your element variables are the same)
     const logoutButton = document.getElementById('logout-button');
     const usernameInput = document.getElementById('username-input');
     const passwordInput = document.getElementById('password-input');
     const loginButton = document.getElementById('login-button');
-    
     const fileInput = document.getElementById('file-input');
     const uploadButton = document.getElementById('upload-button');
     const fileList = document.getElementById('file-list');
-    
     const uploadSection = document.getElementById('upload-section');
     const fileListSection = document.getElementById('file-list-section');
     const quizSection = document.getElementById('quiz-section');
@@ -43,21 +59,17 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.add('hidden');
         }
     });
-
     loginButton.addEventListener('click', () => {
         const username = usernameInput.value;
         const password = passwordInput.value;
         const email = username.toLowerCase() + '@quizapp.local';
-        
         auth.signInWithEmailAndPassword(email, password)
             .catch(error => alert("Incorrect username or password."));
     });
-
     logoutButton.addEventListener('click', () => auth.signOut());
 
     // --- FILE UPLOAD & MANAGEMENT ---
     uploadButton.addEventListener('click', () => fileInput.click());
-    
     fileInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -74,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
         event.target.value = '';
     });
-
     fileList.addEventListener('click', async (event) => {
         const quizId = event.target.dataset.quizId;
         if (event.target.classList.contains('start-button')) {
@@ -96,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await db.collection('quizzes').add(quizData);
         } catch (error) { console.error("Error saving quiz: ", error); }
     }
-
     async function getQuizzesFromFirestore() {
         if (!currentUser) return {};
         const quizzes = {};
@@ -108,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Error fetching quizzes: ", error); }
         return quizzes;
     }
-
     async function deleteQuizFromFirestore(quizId) {
         if (!currentUser) return;
         try {
@@ -147,14 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentQuiz.questions = processedQuestions;
         currentQuestionIndex = 0;
         userAnswers = [];
-
         uploadSection.classList.add('hidden');
         fileListSection.classList.add('hidden');
         quizSection.classList.remove('hidden');
         resultsSection.classList.add('hidden');
         displayQuestion();
     }
-
     function displayQuestion() {
         const question = currentQuiz.questions[currentQuestionIndex];
         document.getElementById('quiz-title').textContent = currentQuiz.title;
@@ -170,13 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
             optionsContainer.appendChild(button);
         });
     }
-
     function selectAnswer(selectedOption, clickedButton) {
         document.querySelectorAll('.option-button').forEach(btn => btn.disabled = true);
         const question = currentQuiz.questions[currentQuestionIndex];
         const correctAnswer = question.correctAnswerText;
         userAnswers[currentQuestionIndex] = selectedOption;
-        
         if (selectedOption === correctAnswer) {
             clickedButton.classList.add('correct');
         } else {
@@ -196,16 +201,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     /**
-     * THIS IS THE CORRECTED FUNCTION
+     * MODIFIED: This function now handles both congrats and troll messages.
      */
     function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
 
-        // --- FIX: Clean up any old congrats message FIRST ---
-        const oldCongrats = resultsSection.querySelector('.congrats-message');
-        if (oldCongrats) {
-            oldCongrats.remove();
+        // Clean up any old feedback messages first
+        const oldFeedback = resultsSection.querySelector('.feedback-message');
+        if (oldFeedback) {
+            oldFeedback.remove();
         }
         
         const reviewContainer = document.getElementById('review-container');
@@ -232,33 +237,51 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
         
-        // This part now only runs if the CURRENT score is perfect
-        if (finalScore === totalQuestions && totalQuestions > 0) {
-            const congratsMessage = document.createElement('div');
-            congratsMessage.className = 'congrats-message'; // This class is important for cleanup
-            congratsMessage.style.textAlign = 'center';
-            congratsMessage.style.margin = '20px 0';
-            
-            const messageText = document.createElement('p');
-            messageText.style.fontSize = '1.2em';
-            messageText.style.color = '#28a745';
-            messageText.style.fontWeight = 'bold';
-            messageText.textContent = `Congratzzz you deserve this mango for scoring ${finalScore}/${totalQuestions} `;
-            
-            const mangoImage = document.createElement('img');
-            mangoImage.src = 'icons/mango.png';
-            mangoImage.alt = 'Mango';
-            mangoImage.style.width = '50px';
-            mangoImage.style.height = '50px';
-            mangoImage.style.verticalAlign = 'middle';
-            mangoImage.style.marginLeft = '10px';
-            
-            messageText.appendChild(mangoImage);
-            congratsMessage.appendChild(messageText);
+        // --- NEW LOGIC FOR CONDITIONAL MESSAGES ---
 
-            // --- FIX: Insert the container, not just the text ---
-            resultsSection.insertBefore(congratsMessage, reviewContainer);
+        // Condition 1: Perfect Score
+        if (finalScore === totalQuestions && totalQuestions > 0) {
+            const randomMsg = congratsMessages[Math.floor(Math.random() * congratsMessages.length)];
+            const randomGifNum = Math.floor(Math.random() * 12) + 1;
+            const gifPath = `icons/congrats/${randomGifNum}.gif`;
+            displayFeedbackMessage(randomMsg, gifPath, '#28a745'); // Green color
+        } 
+        // Condition 2: Score is below 5
+        else if (finalScore < 5 && totalQuestions > 0) {
+            const randomMsg = trollMessages[Math.floor(Math.random() * trollMessages.length)];
+            const randomGifNum = Math.floor(Math.random() * 5) + 1;
+            const gifPath = `icons/troll/${randomGifNum}.gif`;
+            displayFeedbackMessage(randomMsg, gifPath, '#dc3545'); // Red color
         }
+    }
+
+    /**
+     * NEW: A helper function to display the feedback message and GIF.
+     */
+    function displayFeedbackMessage(message, gifPath, color) {
+        const feedbackContainer = document.createElement('div');
+        feedbackContainer.className = 'feedback-message'; // A common class for cleanup
+        feedbackContainer.style.textAlign = 'center';
+        feedbackContainer.style.margin = '20px 0';
+        
+        const messageText = document.createElement('p');
+        messageText.style.fontSize = '1.2em';
+        messageText.style.fontWeight = 'bold';
+        messageText.style.color = color;
+        messageText.textContent = message;
+        
+        const feedbackImage = document.createElement('img');
+        feedbackImage.src = gifPath;
+        feedbackImage.alt = 'Feedback GIF';
+        feedbackImage.style.width = '100px'; // A bit larger for more impact
+        feedbackImage.style.height = '100px';
+        feedbackImage.style.marginTop = '10px';
+        
+        feedbackContainer.appendChild(messageText);
+        feedbackContainer.appendChild(feedbackImage);
+        
+        const reviewContainer = document.getElementById('review-container');
+        resultsSection.insertBefore(feedbackContainer, reviewContainer);
     }
 
     backToHomeButton.addEventListener('click', () => {
@@ -276,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return shuffled;
     }
-
     function parseQuizText(text) {
         try {
             const sections = text.split('---').map(s => s.trim()).filter(s => s);
