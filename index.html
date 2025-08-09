@@ -13,20 +13,17 @@
         <button id="logout-button" class="hidden">Logout</button>
     </header>
 
-<section id="auth-section">
-    <h2>Login to Your Account</h2>
-    <p>This is a single-user demo. Use the credentials provided.</p>
-    <div class="auth-form">
-        <input type="text" id="username-input" placeholder="Username" value="arya" autocomplete="username">
-        <input type="password" id="password-input" placeholder="Password" value="arya123" autocomplete="current-password">
-        <button id="login-button">Login</button>
-    </div>
-</section>
+    <section id="auth-section">
+        <h2>Login</h2>
+        <div class="auth-form">
+            <input type="text" id="username-input" placeholder="Username" autocomplete="username">
+            <input type="password" id="password-input" placeholder="Password" autocomplete="current-password">
+            <button id="login-button">Login</button>
+        </div>
+    </section>
 
-   <main id="app-section" class="hidden">
+    <main id="app-section" class="hidden">
         
-       
-
         <section id="upload-section" class="hidden">
             <h2>Create a New Quiz</h2>
             <p>Upload a .txt file to save a quiz to your account.</p>
@@ -39,7 +36,7 @@
             <div id="file-list">
                 </div>
         </section>
-       
+
         <section id="manage-controls">
             <button id="manage-quiz-button">Manage Quizzes</button>
         </section>
@@ -87,8 +84,5 @@ const firebaseConfig = {
 </body>
 
 </html>
-
-
-
 
 
