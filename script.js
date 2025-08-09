@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginButton.addEventListener('click', () => {
         const username = usernameInput.value;
         const password = passwordInput.value;
-        const email = username + '@quizapp.local'; // Construct special email
+        const email = username.toLowerCase() + '@quizapp.local';
         
         auth.signInWithEmailAndPassword(email, password)
             .catch(error => alert("Incorrect username or password."));
@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Error deleting quiz: ", error); }
     }
 
+    // --- UI RENDERING FUNCTIONS ---
     async function renderFileList() {
         userQuizzes = await getQuizzesFromFirestore();
         fileList.innerHTML = '';
@@ -133,11 +134,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- QUIZ LOGIC ---
+    
+    /**
+     * MODIFIED: This function now randomly selects 10 questions if the quiz has more than 10.
+     */
     function startQuiz(quizId) {
-        currentQuiz = userQuizzes[quizId];
+        // Get the full quiz data from our loaded quizzes
+        const fullQuizData = userQuizzes[quizId];
+
+        // Create a deep copy to avoid changing the original quiz data
+        currentQuiz = JSON.parse(JSON.stringify(fullQuizData));
+
+        // Check if the quiz has more than 10 questions
+        if (currentQuiz.questions.length > 10) {
+            // First, shuffle all questions
+            const shuffledQuestions = shuffleArray(currentQuiz.questions);
+            // Then, take only the first 10 questions from the shuffled list
+            currentQuiz.questions = shuffledQuestions.slice(0, 10);
+        } else {
+            // If the quiz has 10 or fewer questions, just shuffle them
+            currentQuiz.questions = shuffleArray(currentQuiz.questions);
+        }
+
         currentQuestionIndex = 0;
         userAnswers = [];
-        currentQuiz.questions = shuffleArray(currentQuiz.questions);
 
         // Hide main sections and show quiz section
         uploadSection.classList.add('hidden');
@@ -151,11 +171,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const question = currentQuiz.questions[currentQuestionIndex];
         document.getElementById('quiz-title').textContent = currentQuiz.title;
         document.getElementById('question-text').textContent = question.questionText;
-        
         const optionsContainer = document.getElementById('options-container');
         optionsContainer.innerHTML = '';
         const shuffledOptions = shuffleArray(question.options);
-        
         shuffledOptions.forEach(option => {
             const button = document.createElement('button');
             button.className = 'option-button';
@@ -179,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (btn.textContent === correctAnswer) btn.classList.add('correct');
             });
         }
-
         setTimeout(() => {
             currentQuestionIndex++;
             if (currentQuestionIndex < currentQuiz.questions.length) {
@@ -193,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
-
         const oldCongrats = resultsSection.querySelector('.congrats-message');
         if (oldCongrats) oldCongrats.remove();
         
@@ -201,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reviewContainer.innerHTML = '';
         let finalScore = 0;
         const totalQuestions = currentQuiz.questions.length;
-
         currentQuiz.questions.forEach((question, index) => {
             const userAnswer = userAnswers[index];
             const isCorrect = userAnswer === question.correctAnswerText;
@@ -219,10 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
             item.innerHTML = reviewHTML;
             reviewContainer.appendChild(item);
         });
-
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
-
         if (finalScore === totalQuestions && totalQuestions > 0) {
             const congratsMessage = document.createElement('div');
             congratsMessage.className = 'congrats-message';
