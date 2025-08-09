@@ -2,16 +2,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Arrays for paired messages and GIFs ---
     const congratsFeedback = [
-        { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yeeey", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
+        { message: "Congratzz maange", gif: "1.gif" },
+        { message: "Adipoliii", gif: "2.gif" },
+        { message: "Enikk vayya!!!", gif: "3.gif" },
+        { message: "Kollaam mole", gif: "4.gif" },
+        { message: "Keep it up", gif: "5.gif" },
+        { message: "Oh My God!!!", gif: "6.gif" },
+        { message: "Yeeey", gif: "7.gif" },
+        { message: "Maanga jayiche...", gif: "8.gif" },
+        { message: "Yo", gif: "9.gif" },
+        { message: "Nice...", gif: "10.gif" },
+        { message: "Yey yey...", gif: "11.gif" },
+        { message: "Dinga Dinga..", gif: "12.gif" },
     ];
+
     const trollFeedback = [
-        { message: "Enthvaayith?", gif: "1.gif" }, { message: "Onnum parayaanilla...", gif: "2.gif" }, { message: "Padichitt varoo maange...", gif: "3.gif" }, { message: "Nirthy podei...", gif: "4.gif" }, { message: "Ayyee... Thott Thott", gif: "5.gif" }
+        { message: "Enthvaayith?", gif: "1.gif" },
+        { message: "Onnum parayaanilla...", gif: "2.gif" },
+        { message: "Padichitt varoo maange...", gif: "3.gif" },
+        { message: "Nirthy podei...", gif: "4.gif" },
+        { message: "Ayyee... Thott Thott", gif: "5.gif" }
     ];
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
     const db = firebase.firestore();
-
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
     const logoutButton = document.getElementById('logout-button');
@@ -27,11 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizSection = document.getElementById('quiz-section');
     const resultsSection = document.getElementById('results-section');
     const backToHomeButton = document.getElementById('back-to-home-button');
-    const modalOverlay = document.getElementById('modal-overlay');
-    const modalCodeInput = document.getElementById('modal-code-input');
-    const modalSubmitButton = document.getElementById('modal-submit-button');
-    const modalCloseButton = document.getElementById('modal-close-button');
-    const modalError = document.getElementById('modal-error');
     
     // --- GLOBAL VARIABLES ---
     let currentUser = null;
@@ -56,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.add('hidden');
         }
     });
-
     loginButton.addEventListener('click', () => {
         const username = usernameInput.value;
         const password = passwordInput.value;
@@ -64,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         auth.signInWithEmailAndPassword(email, password)
             .catch(error => alert("Incorrect username or password."));
     });
-
     logoutButton.addEventListener('click', () => auth.signOut());
 
     // --- UI EVENT LISTENERS ---
@@ -74,40 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadSection.classList.add('hidden');
             fileListSection.classList.remove('manage-mode');
             manageQuizButton.textContent = 'Manage Quizzes';
-        } else {
-            modalCodeInput.value = "";
-            modalError.classList.add('hidden');
-            modalOverlay.classList.remove('hidden');
-            modalCodeInput.focus();
+            return;
         }
-    });
-
-    modalSubmitButton.addEventListener('click', () => {
-        const code = modalCodeInput.value;
+        const code = prompt("Please enter the authorization code:");
         if (code === "007") {
             isManageMode = true;
             uploadSection.classList.remove('hidden');
             fileListSection.classList.add('manage-mode');
             manageQuizButton.textContent = 'Done Managing';
-            closeModal();
-        } else {
-            modalError.classList.remove('hidden');
-            modalCodeInput.value = "";
+        } else if (code !== null) {
+            alert("Incorrect code.");
         }
     });
-
-    function closeModal() {
-        modalOverlay.classList.add('hidden');
-    }
-    modalCloseButton.addEventListener('click', closeModal);
-    modalOverlay.addEventListener('click', (event) => {
-        if (event.target === modalOverlay) {
-            closeModal();
-        }
-    });
-
     uploadButton.addEventListener('click', () => fileInput.click());
-    
     fileInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -124,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
         event.target.value = '';
     });
-
     fileList.addEventListener('click', async (event) => {
         const quizId = event.target.dataset.quizId;
         if (event.target.classList.contains('start-button')) {
@@ -138,7 +124,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    /**
+     * MODIFIED: Added logic to find and stop any video before going home.
+     */
     backToHomeButton.addEventListener('click', () => {
+        // --- NEW: Find and stop any playing video ---
+        const video = resultsSection.querySelector('video');
+        if (video) {
+            video.pause();
+            video.currentTime = 0; // Reset video to the beginning
+        }
+
+        // --- Existing logic ---
         resultsSection.classList.add('hidden');
         document.getElementById('manage-controls').classList.remove('hidden');
         fileListSection.classList.remove('hidden');
@@ -146,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadSection.classList.add('hidden');
         fileListSection.classList.remove('manage-mode');
         manageQuizButton.textContent = 'Manage Quizzes';
-        closeModal();
     });
 
     // --- FIREBASE QUIZ FUNCTIONS ---
@@ -252,7 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
         const oldFeedback = resultsSection.querySelector('.feedback-message');
-        if (oldFeedback) oldFeedback.remove();
+        if (oldFeedback) {
+            oldFeedback.remove();
+        }
         const reviewContainer = document.getElementById('review-container');
         reviewContainer.innerHTML = '';
         let finalScore = 0;
