@@ -2,26 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Arrays for paired messages and GIFs ---
     const congratsFeedback = [
-        { message: "Congratzz maange", gif: "1.gif" },
-        { message: "Adipoliii", gif: "2.gif" },
-        { message: "Enikk vayya!!!", gif: "3.gif" },
-        { message: "Kollaam mole", gif: "4.gif" },
-        { message: "Keep it up", gif: "5.gif" },
-        { message: "Oh My God!!!", gif: "6.gif" },
-        { message: "Yeeey", gif: "7.gif" },
-        { message: "Maanga jayiche...", gif: "8.gif" },
-        { message: "Yo", gif: "9.gif" }, // Typo removed here
-        { message: "Nice...", gif: "10.gif" },
-        { message: "Yey yey...", gif: "11.gif" },
-        { message: "Dinga Dinga..", gif: "12.gif" },
+        { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yeeey", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
     ];
-
     const trollFeedback = [
-        { message: "Enthvaayith?", gif: "1.gif" },
-        { message: "Onnum parayaanilla...", gif: "2.gif" },
-        { message: "Padichitt varoo maange...", gif: "3.gif" },
-        { message: "Nirthy podei...", gif: "4.gif" },
-        { message: "Ayyee... Thott Thott", gif: "5.gif" }
+        { message: "Enthvaayith?", gif: "1.gif" }, { message: "Onnum parayaanilla...", gif: "2.gif" }, { message: "Padichitt varoo maange...", gif: "3.gif" }, { message: "Nirthy podei...", gif: "4.gif" }, { message: "Ayyee... Thott Thott", gif: "5.gif" }
     ];
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
@@ -171,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FIREBASE QUIZ FUNCTIONS ---
+    // --- FIREBASE QUIZ & RESULTS FUNCTIONS ---
     async function saveQuizToFirestore(quizData) {
         if (!currentUser) return;
         try {
@@ -199,6 +183,21 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await db.collection('quizzes').doc(quizId).delete();
         } catch (error) { console.error("Error deleting quiz: ", error); }
+    }
+    async function saveQuizResult(quizTitle, score, totalQuestions) {
+        if (!currentUser) return;
+        try {
+            await db.collection('quiz_results').add({
+                userId: currentUser.uid,
+                quizTitle: quizTitle,
+                score: score,
+                totalQuestions: totalQuestions,
+                playedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log("Quiz result saved successfully!");
+        } catch (error) {
+            console.error("Error saving quiz result: ", error);
+        }
     }
 
     // --- UI RENDERING ---
@@ -270,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextButton.classList.remove('hidden');
     }
     
-    function showResults() {
+    async function showResults() {
         quizSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
         const oldFeedback = resultsSection.querySelector('.feedback-message');
@@ -298,6 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
             item.innerHTML = reviewHTML;
             reviewContainer.appendChild(item);
         });
+        
+        await saveQuizResult(currentQuiz.title, finalScore, totalQuestions);
+
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
         if (finalScore === totalQuestions && totalQuestions > 0) {
