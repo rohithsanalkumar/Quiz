@@ -187,3 +187,9 @@ button:disabled {
 #modal-close-button {
     background-color: #6c757d; /* A neutral gray */
 }
+/* --- Style for the new logo --- */
+
+#main-logo {
+    height: 50px; /* Adjust this value to make your logo bigger or smaller */
+    width: auto;  /* This keeps the logo's proportions correct */
+}
