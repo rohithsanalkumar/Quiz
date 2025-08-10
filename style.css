@@ -190,7 +190,8 @@ button:disabled {
 /* --- Style for the new logo --- */
 
 #main-logo {
-    height: 20px; /* Adjust this value to make your logo bigger or smaller */
+    height: 30px; /* Adjust this value to make your logo bigger or smaller */
     width: auto;  /* This keeps the logo's proportions correct */
 }
+
 
