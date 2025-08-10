@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Arrays for paired messages and GIFs ---
     const congratsFeedback = [
-        { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yeeey", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
+        { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yassss", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo Yo Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
     ];
     const trollFeedback = [
         { message: "Enthvaayith?", gif: "1.gif" }, { message: "Onnum parayaanilla...", gif: "2.gif" }, { message: "Padichitt varoo maange...", gif: "3.gif" }, { message: "Nirthy podei...", gif: "4.gif" }, { message: "Ayyee... Thott Thott", gif: "5.gif" }
@@ -389,3 +389,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
