@@ -4,12 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const congratsFeedback = [
         { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yeeey", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
     ];
-
     const trollFeedback = [
         { message: "Enthvaayith?", gif: "1.gif" }, { message: "Onnum parayaanilla...", gif: "2.gif" }, { message: "Padichitt varoo maange...", gif: "3.gif" }, { message: "Nirthy podei...", gif: "4.gif" }, { message: "Ayyee... Thott Thott", gif: "5.gif" }
     ];
-
-    // The 'encouragingFeedback' array has been removed.
+    const encouragingFeedback = [
+        { message: "Nice try! You're getting there.", gif: "1.gif"}, { message: "Good effort! Keep practicing.", gif: "2.gif"}, { message: "Not bad at all! Almost there.", gif: "3.gif"}, { message: "Solid performance!", gif: "4.gif"}, { message: "You're on the right track!", gif: "5.gif"}
+    ];
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
@@ -49,19 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let userAnswers = [];
     let isManageMode = false;
 
-    // --- BIRTHDAY FEATURE LOGIC ---
-    function checkBirthday() {
-        // Today is August 24th, so the birthday feature will be active.
-        const BIRTHDAY_MONTH = 7; // August (Months are 0-indexed: 0=Jan, ..., 7=Aug)
-        const BIRTHDAY_DAY = 24;   // 24th
-
-        const today = new Date();
-        const currentMonth = today.getMonth();
-        const currentDay = today.getDate();
-
-        if (currentMonth === BIRTHDAY_MONTH && currentDay === BIRTHDAY_DAY) {
-            birthdayLogo.classList.remove('hidden');
-        }
+    /**
+     * MODIFIED: This function is now simplified to always show the logo.
+     */
+    function showBirthdayLogo() {
+        birthdayLogo.classList.remove('hidden');
     }
 
     birthdayLogo.addEventListener('click', () => {
@@ -72,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function hideBirthdayModal() {
         birthdayModalOverlay.classList.add('hidden');
         birthdayAudio.pause();
-        birthdayAudio.currentTime = 0; // Rewind the audio
+        birthdayAudio.currentTime = 0;
     }
 
     closeBirthdayModal.addEventListener('click', hideBirthdayModal);
@@ -90,12 +82,13 @@ document.addEventListener('DOMContentLoaded', () => {
             appSection.classList.remove('hidden');
             logoutButton.classList.remove('hidden');
             renderFileList(); 
-            checkBirthday();
+            showBirthdayLogo(); // Always show the logo on login
         } else {
             currentUser = null;
             authSection.classList.remove('hidden');
             appSection.classList.add('hidden');
             logoutButton.classList.add('hidden');
+            birthdayLogo.classList.add('hidden'); // Hide logo on logout
         }
     });
     loginButton.addEventListener('click', () => {
@@ -340,11 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         await saveQuizResult(currentQuiz.title, finalScore, totalQuestions);
-
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
-        
-        // The condition for encouraging feedback has been removed.
         if (finalScore === totalQuestions && totalQuestions > 0) {
             const feedback = congratsFeedback[Math.floor(Math.random() * congratsFeedback.length)];
             const gifPath = `icons/congrats/${feedback.gif}`;
@@ -353,6 +343,11 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (finalScore === 0 && totalQuestions > 0) {
             const videoPath = 'videos/fail_video.mp4';
             displayFeedbackVideo(videoPath);
+        }
+        else if ((finalScore === 8 || finalScore === 9) && totalQuestions > 0) {
+            const feedback = encouragingFeedback[Math.floor(Math.random() * encouragingFeedback.length)];
+            const gifPath = `icons/encouraging/${feedback.gif}`;
+            displayFeedbackMessage(feedback.message, gifPath, '#0081a7');
         }
         else if (finalScore < 5 && totalQuestions > 0) {
             const feedback = trollFeedback[Math.floor(Math.random() * trollFeedback.length)];
