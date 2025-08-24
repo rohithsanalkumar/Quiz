@@ -2,11 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Arrays for paired messages and GIFs ---
     const congratsFeedback = [
-        { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yassss", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo Yo Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
+        { message: "Congratzz maange", gif: "1.gif" }, { message: "Adipoliii", gif: "2.gif" }, { message: "Enikk vayya!!!", gif: "3.gif" }, { message: "Kollaam mole", gif: "4.gif" }, { message: "Keep it up", gif: "5.gif" }, { message: "Oh My God!!!", gif: "6.gif" }, { message: "Yeeey", gif: "7.gif" }, { message: "Maanga jayiche...", gif: "8.gif" }, { message: "Yo", gif: "9.gif" }, { message: "Nice...", gif: "10.gif" }, { message: "Yey yey...", gif: "11.gif" }, { message: "Dinga Dinga..", gif: "12.gif" },
     ];
+
     const trollFeedback = [
         { message: "Enthvaayith?", gif: "1.gif" }, { message: "Onnum parayaanilla...", gif: "2.gif" }, { message: "Padichitt varoo maange...", gif: "3.gif" }, { message: "Nirthy podei...", gif: "4.gif" }, { message: "Ayyee... Thott Thott", gif: "5.gif" }
     ];
+
+    // The 'encouragingFeedback' array has been removed.
 
     // --- GRAB HTML & FIREBASE ELEMENTS ---
     const auth = firebase.auth();
@@ -33,6 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalSubmitButton = document.getElementById('modal-submit-button');
     const modalCloseButton = document.getElementById('modal-close-button');
     const modalError = document.getElementById('modal-error');
+    const birthdayLogo = document.getElementById('birthday-logo');
+    const birthdayModalOverlay = document.getElementById('birthday-modal-overlay');
+    const closeBirthdayModal = document.getElementById('close-birthday-modal');
+    const birthdayAudio = document.getElementById('birthday-audio');
     
     // --- GLOBAL VARIABLES ---
     let currentUser = null;
@@ -42,6 +49,39 @@ document.addEventListener('DOMContentLoaded', () => {
     let userAnswers = [];
     let isManageMode = false;
 
+    // --- BIRTHDAY FEATURE LOGIC ---
+    function checkBirthday() {
+        // Today is August 24th, so the birthday feature will be active.
+        const BIRTHDAY_MONTH = 7; // August (Months are 0-indexed: 0=Jan, ..., 7=Aug)
+        const BIRTHDAY_DAY = 24;   // 24th
+
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const currentDay = today.getDate();
+
+        if (currentMonth === BIRTHDAY_MONTH && currentDay === BIRTHDAY_DAY) {
+            birthdayLogo.classList.remove('hidden');
+        }
+    }
+
+    birthdayLogo.addEventListener('click', () => {
+        birthdayModalOverlay.classList.remove('hidden');
+        birthdayAudio.play();
+    });
+
+    function hideBirthdayModal() {
+        birthdayModalOverlay.classList.add('hidden');
+        birthdayAudio.pause();
+        birthdayAudio.currentTime = 0; // Rewind the audio
+    }
+
+    closeBirthdayModal.addEventListener('click', hideBirthdayModal);
+    birthdayModalOverlay.addEventListener('click', (event) => {
+        if (event.target === birthdayModalOverlay) {
+            hideBirthdayModal();
+        }
+    });
+
     // --- FIREBASE AUTHENTICATION ---
     auth.onAuthStateChanged(user => {
         if (user) {
@@ -50,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             appSection.classList.remove('hidden');
             logoutButton.classList.remove('hidden');
             renderFileList(); 
+            checkBirthday();
         } else {
             currentUser = null;
             authSection.classList.remove('hidden');
@@ -155,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FIREBASE QUIZ & RESULTS FUNCTIONS ---
+    // --- FIREBASE QUIZ FUNCTIONS ---
     async function saveQuizToFirestore(quizData) {
         if (!currentUser) return;
         try {
@@ -302,6 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('score').textContent = finalScore;
         document.getElementById('total-questions').textContent = totalQuestions;
+        
+        // The condition for encouraging feedback has been removed.
         if (finalScore === totalQuestions && totalQuestions > 0) {
             const feedback = congratsFeedback[Math.floor(Math.random() * congratsFeedback.length)];
             const gifPath = `icons/congrats/${feedback.gif}`;
@@ -389,4 +432,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
