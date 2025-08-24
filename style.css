@@ -200,7 +200,7 @@ button:disabled {
     height: 100px;
     width: auto;
     cursor: pointer;
-    margin-left: 20px;
+    margin-left: 50px;
 }
 
 #birthday-modal-overlay {
@@ -241,6 +241,7 @@ button:disabled {
     color: #333;
     cursor: pointer;
 }
+
 
 
 
