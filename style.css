@@ -197,7 +197,7 @@ button:disabled {
 /* --- Styles for Birthday Feature --- */
 
 #birthday-logo {
-    height: 100px;
+    height: 1px;
     width: auto;
     cursor: pointer;
     margin-left: 5px;
